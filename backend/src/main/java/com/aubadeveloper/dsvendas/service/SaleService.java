@@ -1,6 +1,8 @@
 package com.aubadeveloper.dsvendas.service;
 
 
+import java.util.List;
+
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -8,6 +10,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
 import com.aubadeveloper.dsvendas.dto.SaleDTO;
+import com.aubadeveloper.dsvendas.dto.SaleSuccessDTO;
+import com.aubadeveloper.dsvendas.dto.SaleSumDTO;
 import com.aubadeveloper.dsvendas.entities.Sale;
 import com.aubadeveloper.dsvendas.repositories.SaleRepository;
 import com.aubadeveloper.dsvendas.repositories.SellerRepository;
@@ -29,4 +33,15 @@ public class SaleService {
 	  //^ = retorna a lista result com a conversão em SellerDTO. (Essa conversão fica por responsabilidade do map)
 		//^ = depois de converter para SellerDTO converte de stream para lista
 	}
+	
+	@Transactional(readOnly = true)
+	public List<SaleSumDTO> amountGroupedBySeller(){
+		return repository.amountGroupedBySeller();
+	}
+	
+	@Transactional(readOnly = true)
+	public List<SaleSuccessDTO> successGroupedBySeller(){
+		return repository.successGroupedBySeller();
+	}
+	
 }
