@@ -1,7 +1,59 @@
 //gráfico de barras
+import axios from 'axios';
+import { useEffect, useState } from 'react';
 import Chart from 'react-apexcharts';
+import { SaleSuccess } from 'types/sale';
+import { round } from 'utils/format';
+import { BASE_URL } from 'utils/requests';
+
+type SeriesData = {
+    name: string;
+    data: number[];
+}
+
+type ChartData = {
+    labels: {
+        categories: string[];
+    };
+    series: SeriesData[];
+}
 
 function BarChart() {
+
+    const [chartData, setChartData] = useState<ChartData>({
+        labels: {
+            categories: []
+        },
+        series: [
+            {
+                name: "",
+                data: []
+            }
+        ]
+    });
+
+    useEffect(() => {
+        axios.get(`${BASE_URL}/sales/success-by-seller`)
+            .then((response) => {
+                const data = response.data as SaleSuccess[];
+                const myLabels = data.map(x => x.sellerName); //para cada x do SaleUm eu vou levar no x.sellerName
+                const mySeries = data.map(x => round(100.0 * x.deals / x.visited, 1));
+
+                setChartData({
+                    labels: {
+                        categories: myLabels
+                    },
+                    series: [
+                        {
+                            name: "% Success",
+                            data: mySeries
+                        }
+                    ]
+                });
+            });
+    }, []);
+
+
     const optionsvar = {
         plotOptions: {
             bar: {
@@ -10,22 +62,11 @@ function BarChart() {
         },
     };
 
-    const mockData = {
-        labels: {
-            categories: ['Anakin', 'Barry Allen', 'Messi', 'Auba', 'Harry']
-        },
-        series: [
-            {
-                name: "% Sucesso",
-                data: [50.5, 43.2, 59.5, 99.9, 55.5]
-            }
-        ]
-    };
 
     return (
         <Chart
-            options={{ ...optionsvar, xaxis: mockData.labels }} //3pontos faz pegar tudo que tem no objeto, reaproveita ele e acrescenta mais coisas
-            series={mockData.series}
+            options={{ ...optionsvar, xaxis: chartData.labels }} //3pontos faz pegar tudo que tem no objeto, reaproveita ele e acrescenta mais coisas
+            series={chartData.series}
             type="bar"
             height="340"
         />
